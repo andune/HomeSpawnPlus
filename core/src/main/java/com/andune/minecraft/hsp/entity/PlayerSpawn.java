@@ -31,10 +31,7 @@
 package com.andune.minecraft.hsp.entity;
 
 import com.andune.minecraft.commonlib.server.api.Location;
-import com.avaje.ebean.annotation.CreatedTimestamp;
-import com.avaje.ebean.validation.Length;
-import com.avaje.ebean.validation.NotEmpty;
-import com.avaje.ebean.validation.NotNull;
+import io.ebean.annotation.CreatedTimestamp;
 
 import javax.annotation.Nullable;
 import javax.persistence.Column;
@@ -46,6 +43,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 
 /**
@@ -67,13 +66,13 @@ public class PlayerSpawn implements EntityWithLocation {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
-    @NotEmpty
-    @Length(max = 32)
+    @NotNull
+    @Size(min = 1, max = 32)
     @Column(name = "player_name")
     private String playerName;
 
-    @NotEmpty
-    @Length(max = 32)
+    @NotNull
+    @Size(min = 1, max = 32)
     private String world;
 
     @NotNull

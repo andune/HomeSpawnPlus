@@ -34,10 +34,10 @@ import com.andune.minecraft.hsp.config.ConfigCore;
 import com.andune.minecraft.hsp.entity.Home;
 import com.andune.minecraft.hsp.entity.HomeImpl;
 import com.andune.minecraft.hsp.storage.dao.HomeDAO;
-import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.Query;
-import com.avaje.ebean.SqlUpdate;
-import com.avaje.ebean.Transaction;
+import io.ebean.EbeanServer;
+import io.ebean.Query;
+import io.ebean.SqlUpdate;
+import io.ebean.Transaction;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -64,12 +64,7 @@ public class HomeDAOEBean implements HomeDAO {
 
     @Override
     public Home findHomeById(int id) {
-        String q = "find home where id = :id";
-
-        Query<HomeImpl> query = ebean.createQuery(HomeImpl.class, q);
-        query.setParameter("id", id);
-
-        return query.findUnique();
+        return ebean.find(HomeImpl.class).where().idEq(id).findUnique();
     }
 
     /* (non-Javadoc)
@@ -77,17 +72,9 @@ public class HomeDAOEBean implements HomeDAO {
      */
     @Override
     public Home findDefaultHome(String world, String playerName) {
-        String q;
-        if (configCore.useEbeanSearchLower())
-            q = "find home where lower(playerName) = lower(:playerName) and world = :world and defaultHome = 1";
-        else
-            q = "find home where playerName = :playerName and world = :world and defaultHome = 1";
-
-        Query<HomeImpl> query = ebean.createQuery(HomeImpl.class, q);
-        query.setParameter("playerName", playerName);
-        query.setParameter("world", world);
-
-        return query.findUnique();
+        return ebean.find(HomeImpl.class).where().ieq("playerName", playerName)
+                .and().eq("world", world)
+                .and().eq("defaultHome", 1).findUnique();
     }
 
     /* (non-Javadoc)
@@ -95,17 +82,9 @@ public class HomeDAOEBean implements HomeDAO {
      */
     @Override
     public Home findBedHome(String world, String playerName) {
-        String q;
-        if (configCore.useEbeanSearchLower())
-            q = "find home where lower(playerName) = lower(:playerName) and world = :world and bedHome = 1";
-        else
-            q = "find home where playerName = :playerName and world = :world and bedHome = 1";
-
-        Query<HomeImpl> query = ebean.createQuery(HomeImpl.class, q);
-        query.setParameter("playerName", playerName);
-        query.setParameter("world", world);
-
-        return query.findUnique();
+        return ebean.find(HomeImpl.class).where().ieq("playerName", playerName)
+                .and().eq("world", world)
+                .and().eq("bedHome", 1).findUnique();
     }
 
     /* (non-Javadoc)
@@ -113,17 +92,8 @@ public class HomeDAOEBean implements HomeDAO {
      */
     @Override
     public Home findHomeByNameAndPlayer(String homeName, String playerName) {
-        String q;
-        if (configCore.useEbeanSearchLower())
-            q = "find home where lower(playerName) = lower(:playerName) and name = :name";
-        else
-            q = "find home where playerName = :playerName and name = :name";
-
-        Query<HomeImpl> query = ebean.createQuery(HomeImpl.class, q);
-        query.setParameter("playerName", playerName);
-        query.setParameter("name", homeName);
-
-        return query.findUnique();
+        return ebean.find(HomeImpl.class).where().ieq("playerName", playerName)
+                .and().eq("name", homeName).findUnique();
     }
 
     /* (non-Javadoc)
@@ -131,20 +101,11 @@ public class HomeDAOEBean implements HomeDAO {
      */
     @Override
     public Set<? extends Home> findHomesByWorldAndPlayer(String world, String playerName) {
-        String q;
-        if (configCore.useEbeanSearchLower())
-            q = "find home where lower(playerName) = lower(:playerName) and world like :world order by world";
-        else
-            q = "find home where playerName = :playerName and world like :world order by world";
-
         if (world == null || "all".equals(world) || "*".equals(world))
             world = "%";
 
-        Query<HomeImpl> query = ebean.createQuery(HomeImpl.class, q);
-        query.setParameter("playerName", playerName);
-        query.setParameter("world", world);
-
-        return query.findSet();
+        return ebean.find(HomeImpl.class).where().eq("playerName", playerName)
+                .and().like("world", world).findSet();
     }
 
     public Set<? extends Home> findHomesByPlayer(String playerName) {

@@ -33,9 +33,19 @@ package com.andune.minecraft.hsp.guice;
 import com.andune.minecraft.commonlib.JarUtils;
 import com.andune.minecraft.commonlib.Logger;
 import com.andune.minecraft.commonlib.LoggerFactory;
-import com.andune.minecraft.commonlib.server.api.*;
+import com.andune.minecraft.commonlib.server.api.Economy;
+import com.andune.minecraft.commonlib.server.api.Factory;
+import com.andune.minecraft.commonlib.server.api.PermissionSystem;
+import com.andune.minecraft.commonlib.server.api.Scheduler;
+import com.andune.minecraft.commonlib.server.api.Server;
+import com.andune.minecraft.commonlib.server.api.Teleport;
+import com.andune.minecraft.commonlib.server.api.YamlFile;
 import com.andune.minecraft.commonlib.server.api.event.EventDispatcher;
-import com.andune.minecraft.commonlib.server.bukkit.*;
+import com.andune.minecraft.commonlib.server.bukkit.BukkitPermissionSystem;
+import com.andune.minecraft.commonlib.server.bukkit.BukkitPlugin;
+import com.andune.minecraft.commonlib.server.bukkit.BukkitScheduler;
+import com.andune.minecraft.commonlib.server.bukkit.BukkitTeleport;
+import com.andune.minecraft.commonlib.server.bukkit.BukkitYamlConfigFile;
 import com.andune.minecraft.hsp.HomeSpawnPlusBukkit;
 import com.andune.minecraft.hsp.config.ConfigCore;
 import com.andune.minecraft.hsp.config.ConfigDynmap;
@@ -57,9 +67,10 @@ import com.andune.minecraft.hsp.integration.worldguard.WorldGuardModule;
 import com.andune.minecraft.hsp.manager.HomeLimitsManager;
 import com.andune.minecraft.hsp.server.api.ServerConfig;
 import com.andune.minecraft.hsp.server.bukkit.BukkitEconomy;
-import com.andune.minecraft.hsp.server.bukkit.*;
+import com.andune.minecraft.hsp.server.bukkit.BukkitEventDispatcher;
 import com.andune.minecraft.hsp.server.bukkit.BukkitFactory;
 import com.andune.minecraft.hsp.server.bukkit.BukkitServer;
+import com.andune.minecraft.hsp.server.bukkit.BukkitServerConfig;
 import com.andune.minecraft.hsp.server.bukkit.command.BukkitCommandRegister;
 import com.andune.minecraft.hsp.storage.BukkitStorageFactory;
 import com.andune.minecraft.hsp.storage.Storage;
@@ -69,9 +80,10 @@ import com.andune.minecraft.hsp.storage.ebean.EBeanUtils;
 import com.andune.minecraft.hsp.strategy.StrategyEngine;
 import com.andune.minecraft.hsp.util.BackupUtil;
 import com.andune.minecraft.hsp.util.BukkitBackupUtil;
-import com.avaje.ebean.EbeanServer;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import io.ebean.Ebean;
+import io.ebean.EbeanServer;
 import org.bukkit.plugin.Plugin;
 
 import javax.inject.Singleton;
@@ -126,9 +138,7 @@ public class BukkitModule extends AbstractModule {
                 .to(BukkitPermissionSystem.class);
         bind(BackupUtil.class)
                 .to(BukkitBackupUtil.class);
-
-        bind(EbeanServer.class)
-                .toInstance(plugin.getDatabase());
+                
         bind(StorageFactory.class)
                 .to(BukkitStorageFactory.class);
         bind(EBeanUtils.class)
@@ -136,6 +146,8 @@ public class BukkitModule extends AbstractModule {
 
         bind(YamlFile.class)
                 .to(BukkitYamlConfigFile.class);
+
+        bind(EbeanServer.class).toProvider(EbeanServerProvider.class).asEagerSingleton();
     }
 
     @Provides

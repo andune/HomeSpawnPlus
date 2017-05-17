@@ -37,13 +37,8 @@ import com.andune.minecraft.hsp.command.BaseCommand;
 import com.andune.minecraft.hsp.commands.uber.UberCommand;
 import com.andune.minecraft.hsp.config.ConfigCommand;
 import com.andune.minecraft.hsp.config.ConfigCore;
-import com.andune.minecraft.hsp.storage.ebean.StorageEBeans;
-import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.cache.ServerCacheManager;
-import com.avaje.ebean.cache.ServerCacheStatistics;
 
 import javax.inject.Inject;
-import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -158,7 +153,12 @@ public class HSPDebug extends BaseCommand {
             }
 
             return true;
-        } else if (args[0].startsWith("eb")) {    // ebeans cache stats
+        }
+        /* disabled since new version of Ebeans no longer has the isBeanCaching() method and I'd
+           like to remove as much extraneous references to ebeans in the code as possible anyway.
+           I highly doubt any admin ever used this capability or will notice/care that it's gone.
+           
+        else if (args[0].startsWith("eb")) {    // ebeans cache stats
             if (storage instanceof StorageEBeans) {
                 StorageEBeans ebeansStorage = (StorageEBeans) storage;
                 EbeanServer ebeans = ebeansStorage.getDatabase();
@@ -181,7 +181,8 @@ public class HSPDebug extends BaseCommand {
             } else {
                 sender.sendMessage("Ebeans storage not in use");
             }
-        } else if (args[0].startsWith("uuid")) {    // ebeans cache stats
+            */
+        else if (args[0].startsWith("uuid")) {    // ebeans cache stats
             if( sender instanceof Player ) {
                 Player p = (Player) sender;
                 UUID uuid = p.getUUID();

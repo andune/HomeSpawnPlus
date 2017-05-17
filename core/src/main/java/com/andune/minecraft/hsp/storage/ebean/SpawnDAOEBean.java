@@ -34,9 +34,9 @@ import com.andune.minecraft.hsp.entity.Spawn;
 import com.andune.minecraft.hsp.entity.SpawnImpl;
 import com.andune.minecraft.hsp.storage.Storage;
 import com.andune.minecraft.hsp.storage.dao.SpawnDAO;
-import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.Query;
-import com.avaje.ebean.SqlUpdate;
+import io.ebean.EbeanServer;
+import io.ebean.Query;
+import io.ebean.SqlUpdate;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -72,13 +72,8 @@ public class SpawnDAOEBean implements SpawnDAO {
      */
     @Override
     public Spawn findSpawnByWorldAndGroup(String world, String group) {
-        String q = "find spawn where world = :world and group_name = :group";
-
-        Query<SpawnImpl> query = ebean.createQuery(SpawnImpl.class, q);
-        query.setParameter("world", world);
-        query.setParameter("group", group);
-
-        return query.findUnique();
+        return ebean.find(SpawnImpl.class).where().eq("world", world)
+                .and().eq("group", group).findUnique();
     }
 
     /* (non-Javadoc)
@@ -86,12 +81,7 @@ public class SpawnDAOEBean implements SpawnDAO {
      */
     @Override
     public Spawn findSpawnByName(String name) {
-        String q = "find spawn where name = :name";
-
-        Query<SpawnImpl> query = ebean.createQuery(SpawnImpl.class, q);
-        query.setParameter("name", name);
-
-        return query.findUnique();
+        return ebean.find(SpawnImpl.class).where().eq("name", name).findUnique();
     }
 
     /* (non-Javadoc)
@@ -99,12 +89,7 @@ public class SpawnDAOEBean implements SpawnDAO {
      */
     @Override
     public Spawn findSpawnById(int id) {
-        String q = "find spawn where id = :id";
-
-        Query<SpawnImpl> query = ebean.createQuery(SpawnImpl.class, q);
-        query.setParameter("id", id);
-
-        return query.findUnique();
+        return ebean.find(SpawnImpl.class).where().idEq(id).findUnique();
     }
 
     public Spawn getNewPlayerSpawn() {
@@ -156,14 +141,6 @@ public class SpawnDAOEBean implements SpawnDAO {
         SqlUpdate update = ebean.createSqlUpdate("delete from hsp_playerspawn where spawn_id = :spawn");
         update.setParameter("spawn", spawn.getId());
         update.execute();
-
-        // per Ebean documentation, server Cache invalidation is deduced automatically
-        // from an update.execute(SqlUpdate), (http://goo.gl/0mVHRG) so there
-        // should be no opportunity for a cached PlayerSpawn object to still
-        // hold reference to a deleted spawn. However a stack trace reported
-        // by a user suggests this may not be true. In which case this commented
-        // out call to getServerCacheManager().clearAll() would provide a fix.
-//        ebean.getServerCacheManager().clearAll();
 
         ebean.delete((SpawnImpl) spawn);
     }

@@ -30,12 +30,11 @@
  */
 package com.andune.minecraft.hsp.entity;
 
-import com.avaje.ebean.validation.NotNull;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author andune

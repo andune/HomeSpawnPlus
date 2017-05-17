@@ -43,8 +43,8 @@ import com.andune.minecraft.hsp.entity.Version;
 import com.andune.minecraft.hsp.server.api.Server;
 import com.andune.minecraft.hsp.storage.Storage;
 import com.andune.minecraft.hsp.storage.StorageException;
-import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.SqlUpdate;
+import io.ebean.EbeanServer;
+import io.ebean.SqlUpdate;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -113,10 +113,7 @@ public class StorageEBeans implements Storage {
     }
 
     public final EbeanServer getDatabase() {
-        if (usePersistanceReimplemented)
-            return persistanceReimplementedDatabase.getDatabase();
-        else
-            return ebeanServer;
+        return ebeanServer;
     }
 
     public boolean isUsePersistanceReimplemented() {
@@ -162,7 +159,7 @@ public class StorageEBeans implements Storage {
 
             // Check that our tables exist - if they don't, then install the database.
             try {
-                ebeanServer.find(SpawnImpl.class).findRowCount();
+                ebeanServer.find(SpawnImpl.class).findCount();
             } catch (PersistenceException ex) {
                 log.info("Installing database for "
                         + plugin.getName()

@@ -38,9 +38,9 @@ import com.andune.minecraft.hsp.entity.HomeInvite;
 import com.andune.minecraft.hsp.storage.Storage;
 import com.andune.minecraft.hsp.storage.StorageException;
 import com.andune.minecraft.hsp.storage.dao.HomeInviteDAO;
-import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.Query;
-import com.avaje.ebean.Transaction;
+import io.ebean.EbeanServer;
+import io.ebean.Query;
+import io.ebean.Transaction;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -71,50 +71,23 @@ public class HomeInviteDAOEBean implements HomeInviteDAO {
 
     @Override
     public HomeInvite findHomeInviteById(int id) {
-        String q = "find homeInvite where id = :id";
-
-        Query<HomeInvite> query = ebean.createQuery(HomeInvite.class, q);
-        query.setParameter("id", id);
-
-        return query.findUnique();
+        return ebean.find(HomeInvite.class).where().idEq(id).findUnique();
     }
 
     @Override
     public HomeInvite findInviteByHomeAndInvitee(Home home, String invitee) {
-        String q;
-        if (configCore.useEbeanSearchLower())
-            q = "find homeInvite where home = :home and lower(invitedPlayer) = lower(:invitee)";
-        else
-            q = "find homeInvite where home = :home and invitedPlayer = :invitee";
-
-        Query<HomeInvite> query = ebean.createQuery(HomeInvite.class, q);
-        query.setParameter("home", home.getId());
-        query.setParameter("invitee", invitee);
-
-        return query.findUnique();
+        return ebean.find(HomeInvite.class).where().eq("home", home)
+                .and().ieq("invitedPlayer", invitee).findUnique();
     }
 
     @Override
     public Set<HomeInvite> findInvitesByHome(Home home) {
-        String q = "find homeInvite where home = :home";
-        Query<HomeInvite> query = ebean.createQuery(HomeInvite.class, q);
-        query.setParameter("home", home.getId());
-
-        return query.findSet();
+        return ebean.find(HomeInvite.class).where().eq("home", home).findSet();
     }
 
     @Override
     public Set<HomeInvite> findAllAvailableInvites(String invitee) {
-        String q;
-        if (configCore.useEbeanSearchLower())
-            q = "find homeInvite where lower(invitedPlayer) = lower(:invitee)";
-        else
-            q = "find homeInvite where invitedPlayer = :invitee";
-
-        Query<HomeInvite> query = ebean.createQuery(HomeInvite.class, q);
-        query.setParameter("invitee", invitee);
-
-        return query.findSet();
+        return ebean.find(HomeInvite.class).where().ieq("invitedPlayer", invitee).findSet();
     }
 
     @Override

@@ -33,8 +33,8 @@ package com.andune.minecraft.hsp.storage.ebean;
 
 import com.andune.minecraft.hsp.entity.Version;
 import com.andune.minecraft.hsp.storage.dao.VersionDAO;
-import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.Query;
+import io.ebean.EbeanServer;
+import io.ebean.Query;
 
 /**
  * @author andune
@@ -55,8 +55,7 @@ public class VersionDAOEBean implements VersionDAO {
      */
     @Override
     public Version getVersionObject() {
-        String q = "find version where id = 1";
-        Query<Version> versionQuery = ebean.createQuery(Version.class, q);
-        return versionQuery.findUnique();
+        return ebean.find(Version.class).where().idEq(1).findUnique();
+
     }
 }

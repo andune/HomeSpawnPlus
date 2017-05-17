@@ -31,13 +31,19 @@
 package com.andune.minecraft.hsp.entity;
 
 import com.andune.minecraft.commonlib.server.api.Location;
-import com.avaje.ebean.annotation.CreatedTimestamp;
-import com.avaje.ebean.validation.Length;
-import com.avaje.ebean.validation.NotEmpty;
-import com.avaje.ebean.validation.NotNull;
+import io.ebean.annotation.CreatedTimestamp;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 
@@ -57,20 +63,20 @@ public class HomeImpl implements EntityWithLocation, Home {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
-    @NotEmpty
-    @Length(max = 32)
-    @Column(name = "player_name")
+    @NotNull
+    @Size(min = 1)
+    @Column(name = "player_name", length = 32)
     private String playerName;
 
-    @Length(max = 32)
+    @Size(max = 32)
     private String name;
 
-    @NotEmpty
-    @Length(max = 32)
+    @NotNull
+    @Size(min = 1, max = 32)
     private String updatedBy;
 
-    @NotEmpty
-    @Length(max = 32)
+    @NotNull
+    @Size(min = 1, max = 32)
     private String world;
 
     @NotNull

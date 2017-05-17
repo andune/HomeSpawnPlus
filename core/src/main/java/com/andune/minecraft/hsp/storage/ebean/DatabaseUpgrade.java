@@ -30,9 +30,9 @@ package com.andune.minecraft.hsp.storage.ebean;
 import com.andune.minecraft.commonlib.Logger;
 import com.andune.minecraft.commonlib.LoggerFactory;
 import com.andune.minecraft.hsp.entity.Version;
-import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.SqlQuery;
-import com.avaje.ebean.SqlUpdate;
+import io.ebean.EbeanServer;
+import io.ebean.SqlQuery;
+import io.ebean.SqlUpdate;
 
 import javax.persistence.PersistenceException;
 import java.sql.Connection;

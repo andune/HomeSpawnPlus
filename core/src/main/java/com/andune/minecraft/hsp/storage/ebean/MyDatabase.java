@@ -32,14 +32,13 @@
 package com.andune.minecraft.hsp.storage.ebean;
 
 import com.andune.minecraft.commonlib.server.api.Plugin;
-import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.EbeanServerFactory;
-import com.avaje.ebean.config.DataSourceConfig;
-import com.avaje.ebean.config.ServerConfig;
-import com.avaje.ebean.config.dbplatform.SQLitePlatform;
-import com.avaje.ebeaninternal.api.SpiEbeanServer;
-import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
-import com.avaje.ebeaninternal.server.lib.sql.TransactionIsolation;
+import io.ebean.EbeanServer;
+import io.ebean.EbeanServerFactory;
+import io.ebean.config.ServerConfig;
+import io.ebean.config.dbplatform.sqlite.SQLitePlatform;
+import io.ebean.dbmigration.DdlGenerator;
+import io.ebeaninternal.api.SpiEbeanServer;
+import org.avaje.datasource.DataSourceConfig;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -53,6 +52,15 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * This poorly named class is the "Persistence-reimplemented" storage method for
+ * HSP, that was originally introduced to work around some issues with the
+ * built-in ebeans for Bukkit. Now that Bukkit has ejected the built-in ebeans
+ * and HSP is shading its own ebeans server, this class should be removed.
+ * However, at the moment I believe there are some database install and upgrade
+ * methods that depend on this class, so those all need to be cleaned up first.
+ * - andune 2017/05/16
+ */
 @Singleton
 public abstract class MyDatabase {
     private Plugin plugin;
@@ -113,12 +121,11 @@ public abstract class MyDatabase {
         ds.setUrl(replaceDatabaseString(url));
         ds.setUsername(username);
         ds.setPassword(password);
-        ds.setIsolationLevel(TransactionIsolation.getLevel(isolation));
 
         //Setup the server configuration
         ServerConfig sc = new ServerConfig();
         sc.setDefaultServer(false);
-        sc.setRegister(false);
+        sc.setRegister(true);
         sc.setName(ds.getUrl().replaceAll("[^a-zA-Z0-9]", ""));
 
         //Get all persistent classes
@@ -140,7 +147,12 @@ public abstract class MyDatabase {
 
             //Modify the platform, as SQLite has no AUTO_INCREMENT field
             sc.setDatabasePlatform(new SQLitePlatform());
-            sc.getDatabasePlatform().getDbDdlSyntax().setIdentity("");
+            
+            // TODO: FIXME. getDbDdlSynxtax() doesn't exist anymore. Presumably something is broken
+            // by not having this anymore, from the comments it seems SQLite auto-increment might
+            // not work anymore. Or if we're lucky, it was implemented in a newer version of SQLite
+            // and this code isn't necessary anymore...  testing is required.
+            // sc.getDatabasePlatform().getDbDdlSyntax().setIdentity("");
         }
 
         prepareDatabaseAdditionalConfig(ds, sc);
@@ -202,7 +214,7 @@ public abstract class MyDatabase {
         for (int i = 0; i < classes.size(); i++) {
             try {
                 //Do a simple query which only throws an exception if the table does not exist
-                ebeanServer.find(classes.get(i)).findRowCount();
+                ebeanServer.find(classes.get(i)).findCount();
 
                 //Query passed without throwing an exception, a database therefore already exists
                 databaseExists = true;
@@ -219,7 +231,9 @@ public abstract class MyDatabase {
 
         //Create a DDL generator
         SpiEbeanServer serv = (SpiEbeanServer) ebeanServer;
-        DdlGenerator gen = serv.getDdlGenerator();
+        DdlGenerator gen = new DdlGenerator(serv, serverConfig);
+//        DdlGenerator gen = serv.getDdlGenerator();
+//        serverConfig.getDatabasePlatform().getPlatformDdl().drop
 
         //Fire "before drop" event
         try {
@@ -231,6 +245,8 @@ public abstract class MyDatabase {
             }
         }
 
+        /** TODO: figure out best way to do this with new versions of Ebeans
+         *
         //Generate a DropDDL-script
         gen.runScript(true, gen.generateDropDdl());
 
@@ -246,6 +262,7 @@ public abstract class MyDatabase {
         } else {
             gen.runScript(false, gen.generateCreateDdl());
         }
+         */
 
         //Fire "after create" event
         try {

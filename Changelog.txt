@@ -1,4 +1,10 @@
-v2.0.1 -
+v2.1.0 - 
+  - update for Minecraft 1.12
+  - biggest change included shading in the ebeans server, since it is no longer included as part of Bukkit/Spigot
+  - FIXME: known issue that a new install of HSP cannot create a database. At this time, dev builds of this version
+    are only for upgrading existing installs.
+
+v2.0.1 - Never officially released (dev builds only)
   - added "onFallThroughWorld" event
   - fixed WorldGuard integration bug when using onEnterRegion/onExitRegion
   - added "/spi" (showPlayerInfo) command to display information HSP knows about a player

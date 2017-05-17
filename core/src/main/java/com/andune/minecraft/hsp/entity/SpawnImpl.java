@@ -33,9 +33,7 @@ package com.andune.minecraft.hsp.entity;
 import com.andune.minecraft.commonlib.server.api.Location;
 import com.andune.minecraft.hsp.storage.Storage;
 import com.andune.minecraft.hsp.storage.dao.SpawnDAO;
-import com.avaje.ebean.annotation.CreatedTimestamp;
-import com.avaje.ebean.validation.Length;
-import com.avaje.ebean.validation.NotNull;
+import io.ebean.annotation.CreatedTimestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -46,6 +44,8 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 
 /**
@@ -64,19 +64,19 @@ public class SpawnImpl implements EntityWithLocation, Spawn {
     private int id;
 
     @NotNull
-    @Length(max = 32)
+    @Size(max = 32)
     private String world;
 
-    @Length(max = 32)
+    @Size(max = 32)
     private String name;
 
     @NotNull
-    @Length(max = 32)
+    @Size(max = 32)
     private String updatedBy;
 
     /* Optional group associated with this spawn.
      */
-    @Length(max = 32)
+    @Size(max = 32)
     @Column(name = "group_name")
     private String group;
 

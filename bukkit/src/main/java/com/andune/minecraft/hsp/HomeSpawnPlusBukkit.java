@@ -39,6 +39,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.io.InputStreamReader;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -104,12 +105,12 @@ public class HomeSpawnPlusBukkit extends JavaPlugin {
             }
             // otherwise use the default file in the JAR
             else {
-                bootstrapConfig.load(super.getResource("config/core.yml"));
+                bootstrapConfig.load(new InputStreamReader(super.getResource("config/core.yml")));
             }
         }
 
         // set defaults to in-JAR config to cover any missing values
-        defaultBootstrapConfig.load(super.getResource("config/core.yml"));
+        defaultBootstrapConfig.load(new InputStreamReader(super.getResource("config/core.yml")));
         bootstrapConfig.setDefaults(defaultBootstrapConfig);
 
         return bootstrapConfig;
@@ -121,7 +122,7 @@ public class HomeSpawnPlusBukkit extends JavaPlugin {
             mainClass.onDisable();
     }
 
-    @Override
+//    @Override
     public List<Class<?>> getDatabaseClasses() {
         return StorageEBeans.getDatabaseClasses();
     }

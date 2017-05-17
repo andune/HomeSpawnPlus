@@ -33,9 +33,9 @@ package com.andune.minecraft.hsp.storage.ebean;
 import com.andune.minecraft.commonlib.server.api.OfflinePlayer;
 import com.andune.minecraft.hsp.server.api.Server;
 import com.andune.minecraft.hsp.storage.dao.PurgePlayer;
-import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.SqlUpdate;
-import com.avaje.ebean.Transaction;
+import io.ebean.EbeanServer;
+import io.ebean.SqlUpdate;
+import io.ebean.Transaction;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;

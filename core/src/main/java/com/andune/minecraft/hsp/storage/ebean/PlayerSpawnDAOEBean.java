@@ -33,8 +33,8 @@ package com.andune.minecraft.hsp.storage.ebean;
 import com.andune.minecraft.hsp.entity.PlayerSpawn;
 import com.andune.minecraft.hsp.storage.StorageException;
 import com.andune.minecraft.hsp.storage.dao.PlayerSpawnDAO;
-import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.Query;
+import io.ebean.EbeanServer;
+import io.ebean.Query;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -59,11 +59,7 @@ public class PlayerSpawnDAOEBean implements PlayerSpawnDAO {
 
     @Override
     public PlayerSpawn findById(int id) {
-        String q = "find spawn where id = :id";
-        Query<PlayerSpawn> query = ebean.createQuery(PlayerSpawn.class, q);
-        query.setParameter("id", id);
-
-        return query.findUnique();
+        return ebean.find(PlayerSpawn.class).where().idEq(id).findUnique();
     }
 
     /* (non-Javadoc)
@@ -71,12 +67,8 @@ public class PlayerSpawnDAOEBean implements PlayerSpawnDAO {
      */
     @Override
     public PlayerSpawn findByWorldAndPlayerName(String world, String playerName) {
-        String q = "find spawn where world = :world and player_name = :player_name";
-        Query<PlayerSpawn> query = ebean.createQuery(PlayerSpawn.class, q);
-        query.setParameter("world", world);
-        query.setParameter("player_name", playerName);
-
-        return query.findUnique();
+        return ebean.find(PlayerSpawn.class).where().ieq("player_name", playerName)
+                .and().eq("world", world).findUnique();
     }
 
     /* (non-Javadoc)
@@ -84,11 +76,7 @@ public class PlayerSpawnDAOEBean implements PlayerSpawnDAO {
      */
     @Override
     public Set<PlayerSpawn> findByPlayerName(String playerName) {
-        String q = "find spawn where player_name = :player_name";
-        Query<PlayerSpawn> query = ebean.createQuery(PlayerSpawn.class, q);
-        query.setParameter("player_name", playerName);
-
-        return query.findSet();
+        return ebean.find(PlayerSpawn.class).where().ieq("player_name", playerName).findSet();
     }
 
     /* (non-Javadoc)

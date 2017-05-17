@@ -31,12 +31,18 @@
 package com.andune.minecraft.hsp.entity;
 
 import com.andune.minecraft.commonlib.server.api.Location;
-import com.avaje.ebean.annotation.CreatedTimestamp;
-import com.avaje.ebean.validation.Length;
-import com.avaje.ebean.validation.NotNull;
+import io.ebean.annotation.CreatedTimestamp;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 
 /**
@@ -56,8 +62,8 @@ public class Player implements EntityWithLocation {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
-    @Length(max = 32)
     @NotNull
+    @Size(max = 32)
     private String name;
 
     /*
@@ -66,12 +72,12 @@ public class Player implements EntityWithLocation {
      * server with 10,000 players, that's only 160k in extra DB storage. Well worth
      * the trade-off for admin readability.
      */
-    @Length(max = 36)
+    @Size(max = 36)
     @Column(name = "uuid")
 //    @NotNull
     private String UUIDString;
 
-    @Length(max = 32)
+    @Size(max = 32)
     private String world;
     private Double x;
     private Double y;

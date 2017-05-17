@@ -33,8 +33,8 @@ package com.andune.minecraft.hsp.storage.ebean;
 import com.andune.minecraft.hsp.entity.PlayerLastLocation;
 import com.andune.minecraft.hsp.storage.StorageException;
 import com.andune.minecraft.hsp.storage.dao.PlayerLastLocationDAO;
-import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.Query;
+import io.ebean.EbeanServer;
+import io.ebean.Query;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -62,25 +62,16 @@ public class PlayerLastLocationDAOEBean implements PlayerLastLocationDAO {
      */
     @Override
     public PlayerLastLocation findById(int id) {
-        String q = "find spawn where id = :id";
-        Query<PlayerLastLocation> query = ebean.createQuery(PlayerLastLocation.class, q);
-        query.setParameter("id", id);
-
-        return query.findUnique();
+        return ebean.find(PlayerLastLocation.class).where().idEq(id).findUnique();
     }
 
     /* (non-Javadoc)
      * @see com.andune.minecraft.hsp.storage.dao.PlayerLastLocationDAO#findByWorldAndPlayerName(java.lang.String, java.lang.String)
      */
     @Override
-    public PlayerLastLocation findByWorldAndPlayerName(String world,
-                                                       String playerName) {
-        String q = "find spawn where world = :world and player_name = :player_name";
-        Query<PlayerLastLocation> query = ebean.createQuery(PlayerLastLocation.class, q);
-        query.setParameter("world", world);
-        query.setParameter("player_name", playerName);
-
-        return query.findUnique();
+    public PlayerLastLocation findByWorldAndPlayerName(String world, String playerName) {
+        return ebean.find(PlayerLastLocation.class).where().ieq("player_name", playerName)
+                .and().eq("world", world).findUnique();
     }
 
     /* (non-Javadoc)
@@ -88,11 +79,7 @@ public class PlayerLastLocationDAOEBean implements PlayerLastLocationDAO {
      */
     @Override
     public Set<PlayerLastLocation> findByPlayerName(String playerName) {
-        String q = "find spawn where player_name = :player_name";
-        Query<PlayerLastLocation> query = ebean.createQuery(PlayerLastLocation.class, q);
-        query.setParameter("player_name", playerName);
-
-        return query.findSet();
+        return ebean.find(PlayerLastLocation.class).where().ieq("player_name", playerName).findSet();
     }
 
     /* (non-Javadoc)

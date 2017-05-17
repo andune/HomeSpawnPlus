@@ -32,9 +32,9 @@ package com.andune.minecraft.hsp.storage.ebean;
 
 import com.andune.minecraft.hsp.entity.Player;
 import com.andune.minecraft.hsp.storage.dao.PlayerDAO;
-import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.SqlUpdate;
-import com.avaje.ebean.Transaction;
+import io.ebean.EbeanServer;
+import io.ebean.SqlUpdate;
+import io.ebean.Transaction;
 
 import java.util.HashSet;
 import java.util.Set;
