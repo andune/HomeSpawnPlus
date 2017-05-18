@@ -177,6 +177,11 @@
            <artifactId>persistence-api</artifactId>
            <version>2.2.1</version>
         </dependency>
+        <dependency>
+           <groupId>io.ebean</groupId>
+           <artifactId>ebean-dbmigration</artifactId>
+           <version>10.1.7</version>
+        </dependency>
 
         <!-- ebean runtime dependencies -->
         <dependency>
@@ -287,6 +292,7 @@
                                     <include>org.avaje:avaje-classpath-scanner</include>
                                     <include>org.avaje:avaje-classpath-scanner-api</include>
                                     <include>io.ebean:persistence-api</include>
+                                    <include>io.ebean:ebean-dbmigration</include>
                                     <include>javax.validation:validation-api</include>
                                     <include>com.fasterxml.jackson.core:jackson-core</include>
                                     <include>org.antlr:antlr4-runtime</include>

@@ -74,12 +74,6 @@ public abstract class BaseStorageFactory implements Initializable, StorageFactor
         log.debug("StorageFactory.getInstance(), type = {}", storageType);
 
         switch (storageType) {
-            case PERSISTANCE_REIMPLEMENTED_EBEANS:
-                StorageEBeans ebeans = injector.getInstance(StorageEBeans.class);
-                ebeans.setUsePersistanceReimplemented(true);
-                storageInstance = ebeans;
-                break;
-
             // container-specific factories must provide YAML capabilities if they support them
             // and assign storageInstance, at which point any future calls to this method will
             // return the assigned StorageInstance and not hit this exception.
@@ -90,6 +84,11 @@ public abstract class BaseStorageFactory implements Initializable, StorageFactor
 
             case CACHED_EBEANS:
                 log.warn("CACHED_EBEANS storage is no longer supported, defaulting to regular EBEANS storage");
+                break;
+
+            case PERSISTANCE_REIMPLEMENTED_EBEANS:
+                log.warn("Persistence reimplimented no longer supported, using EBEANS storage instead");
+                // default is regular EBEANS, so just break out
                 break;
 
             case EBEANS:

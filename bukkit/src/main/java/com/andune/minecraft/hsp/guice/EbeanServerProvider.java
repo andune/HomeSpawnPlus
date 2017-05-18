@@ -30,6 +30,8 @@
  */
 package com.andune.minecraft.hsp.guice;
 
+import com.andune.minecraft.commonlib.Logger;
+import com.andune.minecraft.commonlib.LoggerFactory;
 import com.andune.minecraft.hsp.HomeSpawnPlusBukkit;
 import com.andune.minecraft.hsp.storage.ebean.EBeanUtils;
 import io.ebean.EbeanServer;
@@ -42,13 +44,14 @@ import org.avaje.datasource.DataSourceConfig;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author andune
  */
 public class EbeanServerProvider implements Provider<EbeanServer> {
+    protected static final Logger log = LoggerFactory.getLogger(EbeanServerProvider.class);
+    
     @Inject
     private HomeSpawnPlusBukkit plugin;
     @Inject
@@ -58,11 +61,13 @@ public class EbeanServerProvider implements Provider<EbeanServer> {
     public EbeanServer get() {
 
         ServerConfig config = prepareDatabase();
-        config.setName("pg");
+        config.setName("db");
         // load configuration from ebean.properties
         config.loadFromProperties();
         config.setDefaultServer(true);
         config.setClassLoadConfig(new ClassLoadConfig(this.getClass().getClassLoader()));
+
+        log.debug("db user: {}", config.getDataSourceConfig().getUsername());
 
         return EbeanServerFactory.create(config);
     }
@@ -72,12 +77,12 @@ public class EbeanServerProvider implements Provider<EbeanServer> {
         DataSourceConfig ds = new DataSourceConfig();
         ds.setDriver(ebeanUtils.getDriver());
         ds.setUrl(replaceDatabaseString(ebeanUtils.getUrl()));
-        ds.setUsername(ebeanUtils.getIsolation());
+        ds.setUsername(ebeanUtils.getUsername());
         ds.setPassword(ebeanUtils.getPassword());
 
         //Setup the server configuration
         ServerConfig sc = new ServerConfig();
-        sc.setDefaultServer(false);
+        sc.setDefaultServer(true);
         sc.setRegister(true);
         sc.setName(ds.getUrl().replaceAll("[^a-zA-Z0-9]", ""));
 
@@ -92,7 +97,6 @@ public class EbeanServerProvider implements Provider<EbeanServer> {
 
         //Register them with the EbeanServer
         sc.setClasses(classes);
-
         //Check if the SQLite JDBC supplied with Bukkit is being used
         if (ds.getDriver().equalsIgnoreCase("org.sqlite.JDBC")) {
             sc.setDatabasePlatform(new SQLitePlatform());

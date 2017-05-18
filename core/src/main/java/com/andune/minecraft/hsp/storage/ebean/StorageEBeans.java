@@ -63,8 +63,7 @@ import java.util.List;
 public class StorageEBeans implements Storage {
     private final Logger log = LoggerFactory.getLogger(StorageEBeans.class);
 
-    private MyDatabase persistanceReimplementedDatabase;
-    private boolean usePersistanceReimplemented = false;
+    private final DatabaseInstaller dbSetup;
 
     private final EbeanServer ebeanServer;
     private final EBeanUtils ebeanUtils;
@@ -79,11 +78,11 @@ public class StorageEBeans implements Storage {
 
     @Inject
     public StorageEBeans(EbeanServer ebeanServer, EBeanUtils ebeanUtils, Plugin plugin,
-                         ConfigCore configCore, Server server) {
+                         ConfigCore configCore, Server server, DatabaseInstaller dbSetup) {
         this.ebeanServer = ebeanServer;
         this.ebeanUtils = ebeanUtils;
         this.plugin = plugin;
-        this.usePersistanceReimplemented = false;
+        this.dbSetup = dbSetup;
 
         final EbeanStorageUtil ebeanStorageUtil = new EbeanStorageUtil(server, ebeanServer);
 
@@ -96,28 +95,13 @@ public class StorageEBeans implements Storage {
         playerLastLocationDAO = new PlayerLastLocationDAOEBean(getDatabase(), ebeanStorageUtil);
     }
 
-    public void setUsePersistanceReimplemented(boolean usePersistanceReimplemented) {
-        this.usePersistanceReimplemented = usePersistanceReimplemented;
-    }
-
     @Override
     public String getImplName() {
-        if (usePersistanceReimplemented)
-            return "PersistenceReimplemented";
-        else
-            return "EBEANS";
-    }
-
-    public MyDatabase getPersistanceReimplementedDatabase() {
-        return persistanceReimplementedDatabase;
+        return "EBEANS";
     }
 
     public final EbeanServer getDatabase() {
         return ebeanServer;
-    }
-
-    public boolean isUsePersistanceReimplemented() {
-        return usePersistanceReimplemented;
     }
 
     public static List<Class<?>> getDatabaseClasses() {
@@ -132,50 +116,19 @@ public class StorageEBeans implements Storage {
         return classList;
     }
 
-    private void persistanceReimplementedInitialize() {
-        persistanceReimplementedDatabase = new MyDatabase(plugin) {
-            protected java.util.List<Class<?>> getDatabaseClasses() {
-                return StorageEBeans.getDatabaseClasses();
-            }
-
-            ;
-        };
-
-        persistanceReimplementedDatabase.initializeDatabase(ebeanUtils.getDriver(), ebeanUtils.getUrl(),
-                ebeanUtils.getUsername(), ebeanUtils.getPassword(), ebeanUtils.getIsolation(),
-                ebeanUtils.getLogging(), ebeanUtils.getRebuild());
-    }
-
     /* (non-Javadoc)
      * @see com.andune.minecraft.hsp.IStorage#initializeStorage
      */
     public void initializeStorage() throws StorageException {
-        if (usePersistanceReimplemented) {
-            persistanceReimplementedInitialize();
-        }
-        else {
-            if (ebeanServer == null)
-                throw new IllegalStateException("EbeanServer is null!");
+        if (ebeanServer == null)
+            throw new IllegalStateException("EbeanServer is null!");
 
-            // Check that our tables exist - if they don't, then install the database.
-            try {
-                ebeanServer.find(SpawnImpl.class).findCount();
-            } catch (PersistenceException ex) {
-                log.info("Installing database for "
-                        + plugin.getName()
-                        + " due to first time usage. The warnings you are likely"
-                        + " to see below are normal and are a result of the way"
-                        + " ebeans initializes databases. HSP will run fine despite"
-                        + " these warnings and you will not see them when you"
-                        + " restart your server.");
-
-                // for some reason bukkit's EBEAN implementation blows up when trying
-                // to create the HomeInvite FK relationship. Persistance reimplemented
-                // does not have this problem. So if we have to initialize the database,
-                // we always do it with Persistance Reimplemented, regardless of the
-                // EBEAN implementation we will use after this initialization.
-                persistanceReimplementedInitialize();
-            }
+        // Check that our tables exist - if they don't, then install the database.
+        try {
+            ebeanServer.find(SpawnImpl.class).findCount();
+        } catch (PersistenceException ex) {
+            log.info("Installing database for " + plugin.getName());
+            dbSetup.installDatabase();
         }
 
         try {
