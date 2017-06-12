@@ -323,6 +323,17 @@ public class ConfigCore extends ConfigBase implements Initializable {
     }
 
     /**
+     * If true, HSP will treat child worlds ("_nether" and "_the_end") as
+     * if they were running on the main world. This results in a default
+     * experience more like stock, but for more advanced setups where you
+     * expect strategies like "homeLocalWorld" to always refer to the
+     * world the player is standing on, you would want to turn this off.
+     */
+    public boolean isAssociatedWorldsUseBaseStrategies() {
+        return super.getBoolean("associatedWorldsUseBaseStrategies");
+    }
+
+    /**
      * Return the configured string for the storage type we should
      * use. Examples: "ebeans", "yaml"
      *

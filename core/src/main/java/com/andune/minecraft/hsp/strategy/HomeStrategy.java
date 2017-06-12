@@ -76,15 +76,16 @@ public abstract class HomeStrategy extends BaseStrategy {
      *
      * @return the home matching the current mode on the given world, or null
      */
-    protected Home getModeHome(final StrategyContext context, String worldName) {
+    protected Home getModeHome(final StrategyContext context, final String worldNameArg) {
         final String playerName = context.getPlayer().getName();
 
+        String worldName = worldNameArg;
         // if worldName is null, attempt to set it from context, if available
         if (worldName == null)
             if (context.getEventLocation().getWorld() != null)
                 worldName = context.getEventLocation().getWorld().getName();
 
-        log.debug("getModeHome() worldName={}, location={}", worldName, context.getEventLocation());
+        log.debug("getModeHome() worldName={}, worldNameArg={}, location={}", worldName, worldNameArg, context.getEventLocation());
 
         Home home = null;
         // cache whether or not we are checking distance for efficiency

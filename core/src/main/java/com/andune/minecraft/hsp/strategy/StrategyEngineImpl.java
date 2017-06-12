@@ -370,40 +370,49 @@ public class StrategyEngineImpl implements StrategyEngine {
      * @param context
      */
     private void correctEventLocation(final StrategyContext context) {
-        final Location eventLocation = context.getEventLocation();
-        if (eventLocation != null) {
-            final String worldName = eventLocation.getWorld().getName();
+        log.debug("coorectEventLocation(): entry context={}", context);
 
-            // determine if this is a special world we should look at further
-            int endLength = -1;
-            if (worldName.endsWith("_nether")) {
-                endLength = 7;
-            }
-            if (worldName.endsWith("_the_end")) {
-                endLength = 8;
-            }
+        // we only consider changing the context if AssociatedWorldsUseBaseStrategies
+        // configuration is enabled
+        if (config.isAssociatedWorldsUseBaseStrategies()) {
+            final Location eventLocation = context.getEventLocation();
+            if (eventLocation != null) {
+                final String worldName = eventLocation.getWorld().getName();
 
-            if (endLength > -1) {
-                // this is a special world, check for world-specific strategies 
-                Set<Strategy> worldStrategies = strategyConfig.getWorldStrategies(context.getEventType(), worldName);
-                if (worldStrategies == null || worldStrategies.size() == 0) {
-                    // if we get here, no world-specific strategies exist, so we
-                    // change to the base world name instead and modify the
-                    // context location.
-                    final String baseWorld = worldName.substring(0, worldName.length() - endLength);
-                    log.debug("No per-world strategies found for world {}, using base world {} as context location", worldName, baseWorld);
+                // determine if this is a special world we should look at further
+                int endLength = -1;
+                if (worldName.endsWith("_nether")) {
+                    endLength = 7;
+                }
+                if (worldName.endsWith("_the_end")) {
+                    endLength = 8;
+                }
 
-                    // use the spawn as the location if there is one
-                    Spawn spawn = spawnUtil.getDefaultWorldSpawn(baseWorld);
-                    if (spawn != null && spawn.getLocation() != null) {
-                        context.setLocation(spawn.getLocation());
-                    } else {  // otherwise just use x=0,z=0
-                        Location l = factory.newLocation(baseWorld, 0, 70, 0, 0, 0);
-                        context.setLocation(l);
+                if (endLength > -1) {
+                    // this is a special world, check for world-specific strategies
+                    Set<Strategy> worldStrategies = strategyConfig.getWorldStrategies(context.getEventType(), worldName);
+                    if (worldStrategies == null || worldStrategies.size() == 0) {
+                        // if we get here, no world-specific strategies exist, so we
+                        // change to the base world name instead and modify the
+                        // context location.
+                        final String baseWorld = worldName.substring(0, worldName.length() - endLength);
+                        log.debug("No per-world strategies found for world {}, using base world {} as context location", worldName, baseWorld);
+
+                        // use the spawn as the location if there is one
+                        Spawn spawn = spawnUtil.getDefaultWorldSpawn(baseWorld);
+                        if (spawn != null && spawn.getLocation() != null) {
+                            context.setLocation(spawn.getLocation());
+                        }
+                        else {  // otherwise just use x=0,z=0
+                            Location l = factory.newLocation(baseWorld, 0, 70, 0, 0, 0);
+                            context.setLocation(l);
+                        }
                     }
                 }
             }
         }
+
+        log.debug("coorectEventLocation(): exit context={}", context);
     }
 
     protected boolean isVerbose() {
