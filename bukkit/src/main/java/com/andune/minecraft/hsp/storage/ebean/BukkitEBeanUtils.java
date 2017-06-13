@@ -59,8 +59,8 @@ public class BukkitEBeanUtils implements EBeanUtils {
         this.plugin = plugin;
         this.configuration = YamlConfiguration.loadConfiguration(new File("bukkit.yml"));
         connectionProperties = new Properties();
-        connectionProperties.put("user", configuration.getString("database.username"));
-        connectionProperties.put("password", configuration.getString("database.password"));
+        connectionProperties.put("user", getUsername());
+        connectionProperties.put("password", getPassword());
     }
 
     /* (non-Javadoc)
@@ -68,7 +68,7 @@ public class BukkitEBeanUtils implements EBeanUtils {
      */
     @Override
     public String getDriver() {
-        return configuration.getString("database.driver");
+        return configuration.getString("database.driver", "org.sqlite.JDBC");
     }
 
     /* (non-Javadoc)
@@ -76,7 +76,7 @@ public class BukkitEBeanUtils implements EBeanUtils {
      */
     @Override
     public String getUrl() {
-        return configuration.getString("database.url");
+        return configuration.getString("database.url", "jdbc:sqlite:{DIR}{NAME}.db");
     }
 
     /* (non-Javadoc)
@@ -84,7 +84,7 @@ public class BukkitEBeanUtils implements EBeanUtils {
      */
     @Override
     public String getUsername() {
-        return configuration.getString("database.username");
+        return configuration.getString("database.username", "bukkit");
     }
 
     /* (non-Javadoc)
@@ -92,7 +92,7 @@ public class BukkitEBeanUtils implements EBeanUtils {
      */
     @Override
     public String getPassword() {
-        return configuration.getString("database.password");
+        return configuration.getString("database.password", "walrus");
     }
 
     /* (non-Javadoc)
@@ -100,7 +100,7 @@ public class BukkitEBeanUtils implements EBeanUtils {
      */
     @Override
     public String getIsolation() {
-        return configuration.getString("database.isolation");
+        return configuration.getString("database.isolation", "SERIALIZABLE");
     }
 
     /* (non-Javadoc)
@@ -124,7 +124,7 @@ public class BukkitEBeanUtils implements EBeanUtils {
      */
     @Override
     public boolean isSqlLite() {
-        return configuration.getString("database.driver").contains("sqlite");
+        return getDriver().contains("sqlite");
     }
 
     /* (non-Javadoc)
@@ -132,9 +132,7 @@ public class BukkitEBeanUtils implements EBeanUtils {
      */
     @Override
     public Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(replaceDatabaseString(
-                configuration.getString("database.url")),
-                connectionProperties);
+        return DriverManager.getConnection(replaceDatabaseString(getUrl()), connectionProperties);
     }
 
     private String replaceDatabaseString(String input) {
